@@ -17,7 +17,11 @@ func download_video(url string) *video.V {
 
 	cmd := exec.Command("youtube-dl", url)
 
-	cmd.Dir = "tmp"
+	if ! exists("/tmp/screendream") {
+		create_folder("/tmp/screendream")
+	}
+
+	cmd.Dir = "/tmp/screendream"
 
 	if err := cmd.Start(); err != nil {
 		log.Fatal(err)
@@ -60,6 +64,24 @@ func parse_duration(duration string) int {
 
 }
 
+
+func create_folder(name string) {
+	// create a new folder
+	
+	os.Mkdir(name, 0777)
+}
+
+
+func exists(path string) (bool) {
+	// check if folder path exists
+
+    _, err := os.Stat(path)
+    if err == nil { return true }
+    if os.IsNotExist(err) { return false }
+    return true
+}
+
+
 func get_metadata(url string, option string) string {
 	// use youtube-dl to extract metadata needed for video struct
 
@@ -73,3 +95,4 @@ func get_metadata(url string, option string) string {
 	return strings.Trim(output, "\n")
 
 }
+
