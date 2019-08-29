@@ -35,7 +35,7 @@ func download_video(url string) *video.V {
 	seconds  := parse_duration(duration)
 
 	location := get_metadata(url, "--get-filename")
-	location = "/tmp/"+location
+	location = "/tmp/screendream/"+location
 
 
 	vid := video.NewVideo(title, location, seconds)
@@ -67,7 +67,6 @@ func parse_duration(duration string) int {
 
 func create_folder(name string) {
 	// create a new folder
-	
 	os.Mkdir(name, 0777)
 }
 
@@ -96,3 +95,6 @@ func get_metadata(url string, option string) string {
 
 }
 
+func main() {
+	download_video("https://www.youtube.com/watch?v=1IemshjOnLE")
+}
