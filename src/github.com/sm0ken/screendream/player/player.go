@@ -17,6 +17,7 @@ const (
 
 var command *e.Cmd
 var playerstatus status = dead
+var stdin io.WriteCloser
 
 //plays the video passed as vid
 func Play(vid *v.V) {
@@ -26,6 +27,10 @@ func Play(vid *v.V) {
 	}
 	//start vid
 	command = e.Command("mplayer", "-slave", vid.Location)
+	playerstatus = playing
+	
+	//somebody(tm) should implement error handling
+	stdin, _ = command.StdinPipe()
 	command.Start()
 }
 
@@ -36,11 +41,10 @@ func Kill() {
 }
 
 func SkipTo(time int) {
-	if command != nil && playerstatus != dead {
-		stdin, err := command.StdinPipe()
-		defer stdin.Close()
-		if err != nil {
-			io.WriteString(stdin, "seek "+strconv.Itoa(time)+" 2\n")
-		}
-	}
+	io.WriteString(stdin, "seek "+strconv.Itoa(time)+" 2\n")
+
+}
+
+func Pause(){
+	io.WriteString(stdin, "pause\n")
 }
