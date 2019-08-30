@@ -67,6 +67,7 @@ func parse_duration(duration string) int {
 
 func create_folder(name string) {
 	// create a new folder
+
 	os.Mkdir(name, 0777)
 }
 
@@ -95,6 +96,8 @@ func get_metadata(url string, option string) string {
 
 }
 
+/*
 func main() {
 	download_video("https://www.youtube.com/watch?v=1IemshjOnLE")
 }
+*/
