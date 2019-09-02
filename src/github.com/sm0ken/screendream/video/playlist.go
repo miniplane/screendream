@@ -10,27 +10,40 @@ import (
 type Playlist struct {
 
 	Content  []*V
-	Length   int
 }
 
 func NewPlaylist() *Playlist {
 	ret := new(Playlist)
-	ret.Length = 0
 	return ret
 }
 
 func (P *Playlist) AddVideo(video *V)  {
+	// add a new video at the end of the playlist
+
 	P.Content = append(P.Content, video)
-	P.Length++
 }
 
 func (P *Playlist) RemoveVideo(video *V) {
+	// delete a video from the playlist
 
 	for i, v := range P.Content {
 		if reflect.DeepEqual(v, video) {
 			P.Content = append(P.Content[:i], P.Content[i+1:]...)
 		}
 	}
+}
+
+func (P *Playlist) SwapVideos(video1 *V, video2 *V)  {
+	// swap two videos in the playlist
+
+	for i, v := range P.Content {
+		if reflect.DeepEqual(v, video1) {
+			P.Content[i] = video2
+		} else if reflect.DeepEqual(v, video2) {
+			P.Content[i] = video1
+		}
+	}
+
 }
 
 

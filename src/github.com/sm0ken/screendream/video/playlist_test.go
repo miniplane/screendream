@@ -3,7 +3,6 @@ package video
 import (
 	"testing"
 	"fmt"
-	"strconv"
 )
 
 
@@ -11,6 +10,7 @@ func TestPlaylist(t *testing.T) {
 
 	playlist := NewPlaylist()
 
+	// adding videos
 	vid1 := NewVideo("asdf", "asdf", 46)
 	playlist.AddVideo(vid1)
 
@@ -20,18 +20,23 @@ func TestPlaylist(t *testing.T) {
 	vid3 := NewVideo("asdfb", "asdf", 46)
 	playlist.AddVideo(vid3)
 
-	fmt.Println("Playlist Length: "+strconv.Itoa(playlist.Length))
 	fmt.Println("Current Playlist:\n"+playlist.string())
 
+
+	// swapping videos
+	playlist.SwapVideos(vid1, vid2)
+
+	fmt.Println("Current Playlist:\n"+playlist.string())
+
+
+	// deleting videos
 	playlist.RemoveVideo(vid2)
 
-	fmt.Println("Playlist Length: "+strconv.Itoa(playlist.Length))
 	fmt.Println("Current Playlist:\n"+playlist.string())
 
 	playlist.RemoveVideo(vid1)
 	playlist.RemoveVideo(vid3)
 
-	fmt.Println("Playlist Length: "+strconv.Itoa(playlist.Length))
 	fmt.Println("Current Playlist:\n"+playlist.string())
 
 }
