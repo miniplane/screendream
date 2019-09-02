@@ -10,7 +10,7 @@ import (
 	"github.com/sm0ken/screendream/video"
 )
 
-func download_video(url string) *video.V {
+func Download_video(url string) *video.V {
 	// download a video using youtube-dl
 	// save video to temp
 	// return video struct containing metadata of the video
