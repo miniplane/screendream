@@ -15,3 +15,6 @@ Features:
 	upload and play local files
 	
 	show nnd-like real time text messages on screen
+
+To run:
+	
