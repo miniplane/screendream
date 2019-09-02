@@ -1,3 +1,5 @@
+package api
+
 import (
 	"fmt"
 	"net/http"
@@ -7,9 +9,6 @@ import (
 
 
 func SpinUp() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Welcome to screendream root. Work in Progress")
-	})
 
 	http.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "403")
@@ -46,6 +45,11 @@ func SpinUp() {
 	server := http.server{
 		Addr: ":8080"
 	}
+
+	fs := http.FileServer(http.Dir("static/"))	// create file handler to serve static resources
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	http.Handle("/", fs)
 
 	server.ListenAndServe()
 }
