@@ -1,12 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"os/exec"
 	"time"
 )
+
+type mpvTime struct {
+	Data  float64
+	Error string
+}
 
 // plays a file at a given location
 // not sure about how we want to pass file specifiers here
@@ -94,7 +100,7 @@ func Jump(pos int) {
 	_, _ = c.Write([]byte(cmd))
 }
 
-// TODO: fix, reading the message does not work yet
+// returns the position in the video in seconds
 func Position() int {
 	c := connect()
 	defer c.Close()
@@ -103,13 +109,25 @@ func Position() int {
 
 	_, _ = c.Write([]byte(cmd))
 
-	buff := make([]byte, 0)
+	buf := make([]byte, 512)
 
-	i, _ := c.Read(buff)
+	i, _ := c.Read(buf)
 
-	fmt.Println(buff)
+	s := string(buf[:i])
+	fmt.Println(s)
 
-	return i
+	var m mpvTime
+
+	err := json.Unmarshal(buf[:i], &m)
+
+	if err != nil {
+		log.Println("Error occured:")
+		log.Println(err)
+	}
+
+	fmt.Println(m.Data)
+
+	return int(m.Data)
 }
 
 func main() {
@@ -122,6 +140,8 @@ func main() {
 
 	time.Sleep(2000 * time.Millisecond)
 	Position()
+
+	Quit()
 }
 
 // TODO: command for subtitles/audio tracks, anything else?
