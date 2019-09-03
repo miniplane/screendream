@@ -84,8 +84,10 @@ func SpinUp() {
 	}
 
 	http.Handle("/", new(rootHandler))
+
 	http.Handle("/api/", new(forbiddenHandler))
 	http.Handle("/src/", new(forbiddenHandler))
+
 	http.Handle("/api/play", new(playHandler))
 	http.Handle("/api/next", new(nextHandler))
 	http.Handle("/api/prev", new(prevHandler))
@@ -96,7 +98,7 @@ func SpinUp() {
 	http.Handle("/api/seek", new(seekHandler))
 	http.Handle("/api/clear", new(clearHandler))
 
-	fs := http.FileServer(http.Dir("static/")) // create file handler to serve static resources
+	fs := http.FileServer(http.Dir("static/")) // fs is a httphandler that serves static files
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	log.Print(server.ListenAndServe())
