@@ -33,12 +33,17 @@ func Play(vid *v.V) {
 	//somebody(tm) should implement error handling
 	stdin, _ = command.StdinPipe()
 	command.Start()
+	go waitForTermination()
 }
 
 // kills the currently playing video
 func Kill() {
 	command.Process.Kill()
 	command = nil
+	for i:=0;i<len(observers);i++{
+		observers[i].PlayerNotify(false)
+	}
+	status=dead
 }
 
 func SkipTo(time int) {
@@ -54,17 +59,16 @@ func Time() int{ //time in seconds
 	
 }
 
-//true if ended, false if killed
-func Callback() bool{
-	cb <- callback
-	return cb
-}
+
 
 
 func waitForTermination(){
-	if playerstatus!=dead{
+	if playerstatus!=dead{ 
 		command.Wait()
 		playerstatus=dead
+		for i:=0;i<len(observers);i++{
+			observers[i].PlayerNotify(true)
+		}
 	}
 }
 
