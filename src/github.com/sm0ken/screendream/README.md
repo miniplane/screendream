@@ -3,7 +3,7 @@
 Add your name if you're working on it:
 
 - [ ] implement toggle in mpv.go
-- [ ] tweak mpv settings in mpv.go
+- [x] tweak mpv settings in mpv.go
 - [ ] URL field in video struct
 - [ ] static html generation to embed playlist in html
 - [ ] tweak youtube-dl to download files correctly (audio and video tracks are separate on youtube)

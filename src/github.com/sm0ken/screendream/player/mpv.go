@@ -16,12 +16,14 @@ type mpvTime struct {
 
 // plays a file at a given location
 // not sure about how we want to pass file specifiers here
-func Play(arg1 string) {
+// just fooken yeet the link to the video in here alright
+func Play(arg string) {
 	app := "mpv"
 
 	arg0 := "--input-ipc-server=/tmp/mpvsocket"
+	arg1 := "--fs"
 
-	cmd := exec.Command(app, arg0, arg1)
+	cmd := exec.Command(app, arg0, arg1, arg)
 	log.Printf("Playing %s in mpv, IPC enabled via /tmp/mpvsocket", arg1)
 
 	out, err := cmd.Output()
