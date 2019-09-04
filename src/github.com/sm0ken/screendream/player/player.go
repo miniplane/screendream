@@ -18,6 +18,7 @@ const (
 var command *e.Cmd
 var playerstatus status = dead
 var stdin io.WriteCloser
+var observers []*Observer
 
 //plays the video passed as vid
 func Play(vid *v.V) {
@@ -32,19 +33,43 @@ func Play(vid *v.V) {
 	//somebody(tm) should implement error handling
 	stdin, _ = command.StdinPipe()
 	command.Start()
+	go waitForTermination()
 }
 
 // kills the currently playing video
 func Kill() {
 	command.Process.Kill()
 	command = nil
+	for i:=0;i<len(observers);i++{
+		observers[i].PlayerNotify(false)
+	}
+	status=dead
 }
 
 func SkipTo(time int) {
 	io.WriteString(stdin, "seek "+strconv.Itoa(time)+" 2\n")
-
 }
 
 func Pause(){
 	io.WriteString(stdin, "pause\n")
 }
+
+
+func Time() int{ //time in seconds
+	
+}
+
+
+
+
+func waitForTermination(){
+	if playerstatus!=dead{ 
+		command.Wait()
+		playerstatus=dead
+		for i:=0;i<len(observers);i++{
+			observers[i].PlayerNotify(true)
+		}
+	}
+}
+
+

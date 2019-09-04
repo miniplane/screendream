@@ -10,13 +10,13 @@ func TestPlaylist(t *testing.T) {
 	playlist := NewPlaylist()
 
 	// adding videos
-	vid1 := NewVideo("asdf", "asdf", 46)
+	vid1 := NewVideo("asdf", "asdf", "url", 46)
 	playlist.AddVideo(vid1)
 
-	vid2 := NewVideo("asdfa", "asdf", 46)
+	vid2 := NewVideo("asdfa", "asdf", "url", 46)
 	playlist.AddVideo(vid2)
 
-	vid3 := NewVideo("asdfb", "asdf", 46)
+	vid3 := NewVideo("asdfb", "asdf", "url", 46)
 	playlist.AddVideo(vid3)
 
 	fmt.Println("Current Playlist:\n" + playlist.string())
@@ -40,7 +40,7 @@ func TestPlaylist(t *testing.T) {
 
 func TestVideoPrint(t *testing.T) {
 
-	vid := NewVideo("asdf", "asdf", 46)
+	vid := NewVideo("asdf", "asdf", "url", 46)
 
 	fmt.Println("test:\n" + vid.string())
 
