@@ -1,15 +1,12 @@
 package video
 
-
 import (
+	"fmt"
 	"reflect"
 )
 
-
-
 type Playlist struct {
-
-	Content  []*V
+	Content []*V
 }
 
 func NewPlaylist() *Playlist {
@@ -17,7 +14,7 @@ func NewPlaylist() *Playlist {
 	return ret
 }
 
-func (P *Playlist) AddVideo(video *V)  {
+func (P *Playlist) AddVideo(video *V) {
 	// add a new video at the end of the playlist
 
 	P.Content = append(P.Content, video)
@@ -33,7 +30,7 @@ func (P *Playlist) RemoveVideo(video *V) {
 	}
 }
 
-func (P *Playlist) SwapVideos(video1 *V, video2 *V)  {
+func (P *Playlist) SwapVideos(video1, video2 *V) {
 	// swap two videos in the playlist
 
 	for i, v := range P.Content {
@@ -46,14 +43,15 @@ func (P *Playlist) SwapVideos(video1 *V, video2 *V)  {
 
 }
 
-
-func (p *Playlist) string() string {
-	s := ""
-	for _, element := range p.Content {
-		s = s + element.string() + "\n"
-	}
-
-	return (s)
+func (P *Playlist) SwapByIndex(i, j int) {
+	P.Content[i], P.Content[j] = P.Content[j], P.Content[i]
 }
 
+func (p *Playlist) String() string {
+	s := ""
+	for _, element := range p.Content {
+		s += fmt.Sprint(*element) + "\n"
+	}
 
+	return s
+}
