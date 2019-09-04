@@ -38,7 +38,7 @@ func Download_video(url string) *video.V {
 	location = "/tmp/screendream/"+location
 
 
-	vid := video.NewVideo(title, location, seconds)
+	vid := video.NewVideo(title, location, url, seconds)
 	
 	return vid
 }
@@ -49,18 +49,27 @@ func parse_duration(duration string) int {
 	// convert minutes to seconds
 	// doesn't work for hour long videos yet
 
+	err1, err2, err3 := error(nil), error(nil), error(nil)
+	seconds, minutes, hours := 0, 0, 0
+
 	s := strings.Split(duration, ":")
+	seconds, err1 = strconv.Atoi(s[len(s)-1])
 
-	minutes, err1 := strconv.Atoi(s[0])
-	seconds, err2 := strconv.Atoi(s[1])
+	if len(s) >= 2 {
 
-	if err1 != nil || err2 != nil {
-        fmt.Println(err1, err2)
-        os.Exit(2)
+		minutes, err2 = strconv.Atoi(s[len(s)-2])
+
+		if len(s) == 3 {
+			hours, err3 = strconv.Atoi(s[0])
+		}
+	}
+
+	if err1 != nil || err2 != nil ||  err3 != nil {
+        fmt.Println(err1, err2, err3)
+        // todo log
     }
 
-    return 60*minutes+seconds
-
+	return seconds + minutes*60 + hours*60*60
 
 }
 

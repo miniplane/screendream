@@ -1,7 +1,6 @@
 package video
 
 import (
-	"fmt"
 	"reflect"
 )
 
