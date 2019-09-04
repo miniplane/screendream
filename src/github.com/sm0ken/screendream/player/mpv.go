@@ -42,14 +42,16 @@ func Play(arg string) {
 	log.Println("Successfully finished playing %s", arg1)
 }
 
-func connect() net.Conn {
+func connect() (net.Conn, error) {
 	c, err := net.Dial("unix", "/tmp/mpvsocket")
 	if err != nil {
+		log.Fatal("Could not connect to unix socket, make sure mpv is running.")
 		log.Fatal(err)
-		panic(err) // TODO: better error handling
+		return nil, err
+		// TODO: better error handling
 	}
 
-	return c
+	return c, nil
 }
 
 // does not use makeCmd because the value may be a literal such as a boolean
@@ -62,7 +64,7 @@ func getProperty(p string) string {
 }
 
 func execCmd(cmd string) {
-	c := connect()
+	c, _ := connect()
 	defer c.Close()
 
 	i, err := c.Write([]byte(cmd))
@@ -74,7 +76,7 @@ func execCmd(cmd string) {
 }
 
 func execRead(cmd string) (int, *[]byte) {
-	c := connect()
+	c, _ := connect()
 	defer c.Close()
 
 	i, err := c.Write([]byte(cmd))
@@ -164,12 +166,7 @@ func makeCmd(args ...string) string {
 }
 
 func cycle(prop string) {
-	c := connect()
-	defer c.Close()
-
-	cmd := makeCmd("cycle", prop)
-
-	_, _ = c.Write([]byte(cmd))
+	execCmd(makeCmd("cycle", prop))
 }
 
 func CycleAudio() {
