@@ -1,8 +1,6 @@
 package video
 
 import (
-	"log"
-	"net/url"
 	"strconv"
 )
 
@@ -10,21 +8,13 @@ type V struct {
 	Name     string
 	Location string
 	Duration int
-	URL      url.URL
 }
 
-func NewVideo(name string, loc string, dur int, rawurl string) *V {
+func NewVideo(name string, loc string, dur int) *V {
 	ret := new(V)
 	ret.Name = name
 	ret.Location = loc
 	ret.Duration = dur
-	uri, err = url.Parse(rawurl)
-
-	if err != nil {
-		log.Fatal(err)
-	} else {
-		ret.URL = uri
-	}
 
 	return ret
 }

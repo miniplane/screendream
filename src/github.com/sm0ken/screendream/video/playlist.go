@@ -43,14 +43,10 @@ func (P *Playlist) SwapVideos(video1, video2 *V) {
 
 }
 
-func (P *Playlist) SwapByIndex(i, j int) {
-	P.Content[i], P.Content[j] = P.Content[j], P.Content[i]
-}
-
-func (p *Playlist) String() string {
+func (p *Playlist) string() string {
 	s := ""
 	for _, element := range p.Content {
-		s += fmt.Sprint(*element) + "\n"
+		s += s + element.string() + "\n"
 	}
 
 	return s

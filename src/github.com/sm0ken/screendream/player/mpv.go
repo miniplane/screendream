@@ -14,6 +14,11 @@ type mpvTime struct {
 	Error string
 }
 
+type mpvPlay struct {
+	Data  bool
+	Error string
+}
+
 // plays a file at a given location
 // not sure about how we want to pass file specifiers here
 // just fooken yeet the link to the video in here alright
@@ -70,7 +75,33 @@ func Toggle() {
 	c := connect()
 	defer c.Close()
 
-	cmd := setProperty("pause", "true")
+	cmd := getProperty("pause")
+
+	_, _ = c.Write([]byte(cmd))
+
+	buf := make([]byte, 512)
+
+	i, _ := c.Read(buf)
+
+	s := string(buf[:i])
+	fmt.Println(s)
+
+	var m mpvPlay
+
+	err := json.Unmarshal(buf[:i], &m)
+
+	if err != nil {
+		log.Println("Error occured:")
+		log.Println(err)
+	}
+
+	fmt.Println(m.Data)
+
+	if m.Data {
+		cmd = setProperty("pause", "false")
+	} else {
+		cmd = setProperty("pause", "true")
+	}
 
 	_, _ = c.Write([]byte(cmd))
 }
@@ -134,6 +165,14 @@ func Position() int {
 
 func main() {
 	go Play("/Users/zero/feet.mp4")
+
+	time.Sleep(3000 * time.Millisecond)
+
+	Toggle()
+
+	time.Sleep(1000 * time.Millisecond)
+
+	Toggle()
 
 	time.Sleep(5000 * time.Millisecond)
 	Position()

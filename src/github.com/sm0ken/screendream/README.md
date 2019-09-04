@@ -3,7 +3,7 @@
 Add your name if you're working on it:
 
 - [ ] implement toggle in mpv.go
-- [x] tweak mpv settings in mpv.go
+- [ ] tweak mpv settings in mpv.go
 - [ ] URL field in video struct
 - [ ] static html generation to embed playlist in html
 - [ ] tweak youtube-dl to download files correctly (audio and video tracks are separate on youtube)
@@ -12,6 +12,6 @@ Add your name if you're working on it:
 
 ## TODO for later:
 
-- [ ] persistant playlist between restarting (both program and computer)
+- [ ] persistent playlist between restarting (both program and computer)
 - [ ] research protocol for local file streaming
 - [ ] write client for local streaming if necessary
