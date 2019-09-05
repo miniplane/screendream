@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"os/exec"
+	"strconv"
 	"time"
 )
 
@@ -41,61 +42,81 @@ func Play(arg string) {
 	log.Println("Successfully finished playing %s", arg1)
 }
 
-func connect() net.Conn {
+func connect() (net.Conn, error) {
 	c, err := net.Dial("unix", "/tmp/mpvsocket")
 	if err != nil {
+		log.Fatal("Could not connect to unix socket, make sure mpv is running.")
 		log.Fatal(err)
-		panic(err) // TODO: better error handling
+		return nil, err
+		// TODO: better error handling
 	}
 
-	return c
+	return c, nil
 }
 
+// does not use makeCmd because the value may be a literal such as a boolean
 func setProperty(p, v string) string {
 	return fmt.Sprintf(`{"command": ["set_property", "%s", %s]}`, p, v) + "\n"
 }
 
 func getProperty(p string) string {
-	return fmt.Sprintf(`{"command": ["get_property", "%s"]}`, p) + "\n"
+	return makeCmd("get_property", p)
+}
+
+func execCmd(cmd string) {
+	c, _ := connect()
+	defer c.Close()
+
+	i, err := c.Write([]byte(cmd))
+
+	if err != nil {
+		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("Command length was %d, wrote %d bytes.", len(cmd), i))
+	}
+}
+
+func execRead(cmd string) (int, *[]byte) {
+	c, _ := connect()
+	defer c.Close()
+
+	i, err := c.Write([]byte(cmd))
+
+	if err != nil {
+		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("Command length was %d, wrote %d bytes.", len(cmd), i))
+	}
+
+	buf := make([]byte, 512)
+
+	i, err = c.Read(buf)
+
+	if err != nil {
+		log.Fatal(err)
+		log.Fatal(fmt.Sprintf("Error while reading communication from mpv. %d bytes read."), i)
+	}
+
+	return i, &buf
 }
 
 // exits mpv
 func Quit() {
-	c := connect()
-	defer c.Close()
-
-	_, err := c.Write([]byte(`{"command": ["quit"]}` + "\n")) // TODO check amount of bytes sent
-	if err != nil {
-		log.Fatal(err)
-	}
+	execCmd(makeCmd("quit"))
 }
 
 // Currently broken, TODO either use static variable or get current state
 func Toggle() {
-	c := connect()
-	defer c.Close()
+	var cmd string
 
-	cmd := getProperty("pause")
-
-	_, _ = c.Write([]byte(cmd))
-
-	buf := make([]byte, 512)
-
-	i, _ := c.Read(buf)
-
-	s := string(buf[:i])
-	fmt.Println(s)
+	i, buf := execRead(getProperty("pause"))
 
 	var m mpvPlay
 
-	err := json.Unmarshal(buf[:i], &m)
+	err := json.Unmarshal((*buf)[:i], &m)
 
 	if err != nil {
-		log.Println("Error occured:")
+		log.Println("Error occured while unmarshaling:")
 		log.Println(err)
 	}
-
-	fmt.Println(m.Data)
 
 	if m.Data {
 		cmd = setProperty("pause", "false")
@@ -103,72 +124,66 @@ func Toggle() {
 		cmd = setProperty("pause", "true")
 	}
 
-	_, _ = c.Write([]byte(cmd))
+	execCmd(cmd)
 }
 
 func Pause() {
-	c := connect()
-	defer c.Close()
-
-	cmd := setProperty("pause", "true")
-
-	_, _ = c.Write([]byte(cmd))
+	execCmd(setProperty("pause", "false"))
 }
 
 func Resume() {
-	c := connect()
-	defer c.Close()
-
-	cmd := setProperty("pause", "false")
-
-	_, _ = c.Write([]byte(cmd))
+	execCmd(setProperty("pause", "false"))
 }
 
 func Jump(pos int) {
-	c := connect()
-	defer c.Close()
-
-	cmd := fmt.Sprintf(`{"command": ["seek", "%d", "absolute"]}`, pos) + "\n"
-
-	_, _ = c.Write([]byte(cmd))
+	execCmd(makeCmd("seek", strconv.Itoa(pos), "absolute"))
 }
 
 // returns the position in the video in seconds
 func Position() int {
-	c := connect()
-	defer c.Close()
-
-	cmd := getProperty("playback-time")
-
-	_, _ = c.Write([]byte(cmd))
-
-	buf := make([]byte, 512)
-
-	i, _ := c.Read(buf)
-
-	s := string(buf[:i])
-	fmt.Println(s)
+	i, buf := execRead(getProperty("playback-time"))
 
 	var m mpvTime
 
-	err := json.Unmarshal(buf[:i], &m)
+	err := json.Unmarshal((*buf)[:i], &m)
 
 	if err != nil {
 		log.Println("Error occured:")
 		log.Println(err)
 	}
 
-	fmt.Println(m.Data)
-
 	return int(m.Data)
 }
 
+func makeCmd(args ...string) string {
+	var res string
+
+	for _, arg := range args {
+		res += `"` + arg + `", `
+	}
+
+	return `{"command": [` + res[:(len(res)-2)] + `]}` + "\n"
+}
+
+func cycle(prop string) {
+	execCmd(makeCmd("cycle", prop))
+}
+
+func CycleAudio() {
+	cycle("aid")
+}
+
+func CycleSubs() {
+	cycle("sid")
+}
+
 func main() {
-	go Play("/Users/zero/feet.mp4")
+	go Play("/Users/zero/magus.mkv")
 
 	time.Sleep(3000 * time.Millisecond)
 
-	Toggle()
+	CycleAudio()
+	CycleSubs()
 
 	time.Sleep(1000 * time.Millisecond)
 
