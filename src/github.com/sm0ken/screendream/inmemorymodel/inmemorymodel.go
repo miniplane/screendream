@@ -16,6 +16,10 @@ var {
 }
 
 
+func Videos() video.V{
+	return videos
+}
+
 func init(){
 	videos = make([]*video.V,0,50)
 	listMux = new(sync.Mutex)
