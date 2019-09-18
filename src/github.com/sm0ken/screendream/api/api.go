@@ -1,20 +1,35 @@
 package main
 
 import (
+	"github.com/sm0ken/screendream/video"
+	"github.com/sm0ken/screendream/downloader"
 	"fmt"
 	"log"
 	"net/http"
+	"html/template"
 )
+
+var Playlist *video.Playlist = video.NewPlaylist()
+
 
 type rootHandler struct {
 	clients int
 }
 
+
+
 func (h *rootHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.clients++
+	
 	fmt.Println("Root served ", h.clients, " times")
-	http.ServeFile(w, r, "./static/index.html")
+
+    tmpl := template.Must(template.ParseFiles("./src/github.com/sm0ken/screendream/api/index.html"))
+    tmpl.Execute(w, Playlist)
+
+    http.ListenAndServe(":80", nil)
+
+	//http.ServeFile(w, r, "./static/index.html")
 }
+
 
 type playHandler struct {
 }
@@ -40,11 +55,28 @@ type currentHandler struct {
 func (h *currentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
+
 type postHandler struct {
 }
 
 func (h *postHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+
+    if err := r.ParseForm(); err != nil {
+        fmt.Println(w, "ParseForm() err: %v", err)
+        return
+    }
+    url := r.FormValue("url")
+
+    vid := downloader.Download_video(url)
+	Playlist.AddVideo(vid)
+
+	tmpl := template.Must(template.ParseFiles("./src/github.com/sm0ken/screendream/api/index.html"))
+    tmpl.Execute(w, Playlist)
+
+    http.ListenAndServe(":80", nil)
 }
+
 
 type fetchHandler struct {
 }
